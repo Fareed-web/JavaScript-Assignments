@@ -1,0 +1,11 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.btn button {
+    padding: 5px 40px;
+    font-size: 20px;
+}
