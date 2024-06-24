@@ -1,25 +1,55 @@
+document.querySelector('#login-btn').onclick = function() {
+    const email = document.querySelector('#email').value;
+    if(email.length == 0){
+        alert("Kindly Enter Email!!!!");
+    } else {
+        localStorage.setItem('userEmail', email);
+        document.querySelector('#login').style.display = 'none';
+        document.querySelector('#newtask').style.display = 'block';
+        loadTasks(email);
+    }
+}
+
 document.querySelector('#push').onclick = function(){
-    if(document.querySelector('#newtask input').value.length == 0){
+    const email = localStorage.getItem('userEmail');
+    const taskInput = document.querySelector('#newtask input');
+    if(taskInput.value.length == 0){
         alert("Kindly Enter Task Name!!!!")
+    } else {
+        let tasks = JSON.parse(localStorage.getItem(email)) || [];
+        tasks.push(taskInput.value);
+        localStorage.setItem(email, JSON.stringify(tasks));
+        taskInput.value = '';
+        loadTasks(email);
     }
+}
 
-    else{
-        document.querySelector('#tasks').innerHTML += `
-            <div class="task">
-                <span id="taskname">
-                    ${document.querySelector('#newtask input').value}
-                </span>
-                <button class="delete">
-                    <i class="far fa-trash-alt"></i>
-                </button>
-            </div>
-        `;
+function loadTasks(email) {
+    const tasks = JSON.parse(localStorage.getItem(email)) || [];
+    const tasksContainer = document.querySelector('#tasks');
+    tasksContainer.innerHTML = '';
+    tasks.forEach(task => {
+        const taskElement = document.createElement('div');
+        taskElement.classList.add('task');
 
-        var current_tasks = document.querySelectorAll(".delete");
-        for(var i=0; i<current_tasks.length; i++){
-            current_tasks[i].onclick = function(){
-                this.parentNode.remove();
+        const taskName = document.createElement('span');
+        taskName.id = 'taskname';
+        taskName.innerText = task;
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.classList.add('delete');
+        deleteBtn.innerHTML = '<i class="far fa-trash-alt"></i>';
+        deleteBtn.onclick = function() {
+            const taskIndex = tasks.indexOf(task);
+            if (taskIndex > -1) {
+                tasks.splice(taskIndex, 1);
             }
+            localStorage.setItem(email, JSON.stringify(tasks));
+            loadTasks(email);
         }
-    }
+
+        taskElement.appendChild(taskName);
+        taskElement.appendChild(deleteBtn);
+        tasksContainer.appendChild(taskElement);
+    });
 }
